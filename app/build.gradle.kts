@@ -45,7 +45,6 @@ android {
 
 dependencies {
     implementation(project(":core"))
-    implementation(project(":proot-plugin"))
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.apache.commons:commons-compress:1.27.1")
     testImplementation("org.tukaani:xz:1.10")

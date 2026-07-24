@@ -13,7 +13,7 @@ Application ID: `com.nidrzero.atomux`
   native session builders, and offline bootstrap installation
 - `proot-plugin/`: optional proot launcher that returns the same host-facing
   session contract as `core`
-- `sample-app/`: the Atomux host app that owns the runtime and verifies the
+- `app/`: the Atomux host app that owns the runtime and verifies the
   runtime API surface
 - `tools/`: verification and merge-protection scripts
 
@@ -29,7 +29,8 @@ namespace. The installed app identity is `com.nidrzero.atomux`.
   offline bootstrap on cold start when the payload is available.
 - Native sessions come from `core`, while proot sessions stay isolated in the
   optional plugin and share the same `iTermuxSession` contract.
-- `sample-app/` is the Atomux host and the runtime verification surface.
+- `app/` is the Atomux host and the runtime verification surface. It does not
+  depend on the optional proot plugin.
 - Bootstrap payloads are not committed to the repo. The removed placeholder
   archives were synthetic; a real per-ABI bootstrap must be built and supplied
   before a cold offline first-run works on device.
@@ -40,6 +41,7 @@ namespace. The installed app identity is `com.nidrzero.atomux`.
 
 - `./gradlew.bat :core:testDebugUnitTest`
 - `./gradlew.bat :proot-plugin:testDebugUnitTest`
+- `./gradlew.bat :app:testDebugUnitTest`
 - `./gradlew.bat assembleDebug`
 - `powershell -ExecutionPolicy Bypass -File tools\\verify-no-termux-literals.ps1`
 - `powershell -ExecutionPolicy Bypass -File tools\\verify-supported-packages-sync.ps1`

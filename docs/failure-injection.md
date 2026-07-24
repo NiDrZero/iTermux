@@ -32,9 +32,9 @@ Run the focused failure harness with:
 | Session kill recovery | Call `iTermux.recoverSessionFromOsKill()` with a restart lambda | Covered by `iTermuxSessionControllerTest.successfullyRecoversOneTimeAfterOsKill()` and `iTermuxLifecycleListenerTest.dispatchesRecoverySessionLifecycleTransitions()` | `KILLED_BY_OS` / `RECOVERING` then back to `RUNTIME_READY` |
 | Session kill exhaustion | Call `recoverSessionFromOsKill()` on a session that already used its retry or return `null` from restart | Covered by `iTermuxSessionControllerTest.transitionsToDeadWhenRecoveryBudgetIsExhausted()` and `transitionsToDeadWhenRestartFails()` | `DEAD` then `RUNTIME_UNAVAILABLE` |
 
-## Manual sample-app checks
+## Manual app checks
 
-Use `sample-app/` as the DS spike once the automated harness is green.
+Use `app/` as the DS spike once the automated harness is green.
 
 1. Clear the sample app's data to observe a cold bootstrap path.
 2. Launch the app and confirm the lifecycle timeline includes bootstrap states

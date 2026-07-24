@@ -19,4 +19,4 @@ rootProject.name = "internal-termux"
 
 include(":core")
 include(":proot-plugin")
-include(":sample-app")
+include(":app")

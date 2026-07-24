@@ -1,8 +1,30 @@
 # Upstream Sync
 
-`internal-termux` keeps the editable Android project in the repo root and uses
-`upstream/` only as clean mirrors. Upstream syncing should stay explicit so the
-fork only absorbs reviewed changes.
+Atomux keeps the editable Android project in the repo root and uses `upstream/`
+only as clean mirrors. Upstream syncing should stay explicit so the fork only
+absorbs reviewed changes.
+
+## Two separate upstream lineages
+
+Atomux has two distinct upstreams, and they must never be collapsed into one
+"upstream":
+
+- **Fork upstream — [`2kDarki/iTermux`](https://github.com/2kDarki/iTermux)**:
+  this repository's direct parent. It is the embeddable, host-agnostic Termux
+  runtime that Atomux builds on. This is the primary lineage to track for
+  runtime, path-resolution, bootstrap, and session-contract changes.
+- **Termux upstream — [`termux/termux-app`](https://github.com/termux/termux-app)**:
+  the original project that `2kDarki/iTermux` itself descends from. It is a
+  reference-only source for terminal-emulator/terminal-view internals and
+  upstream security fixes. Changes flow Termux → fork → Atomux, reviewed at
+  each hop; Atomux does not merge Termux directly without going through the
+  fork lineage's framing.
+
+Mirror each lineage under its own path (for example `upstream/itermux` for the
+fork parent and `upstream/termux-app` for Termux) and compare against the
+lineage that actually owns the file you are reviewing. Do not diff a
+fork-runtime file against Termux, or a terminal-core file against the fork
+parent, without knowing which lineage introduced it.
 
 ## Reference refs
 
