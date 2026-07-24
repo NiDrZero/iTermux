@@ -173,6 +173,15 @@ If any of these appear:
 - explain the risk in plain English
 - offer a safer alternative
 
+Pin versions from the source of truth, never from a search snippet:
+Plain-English meaning: the "version number" of a tool or library is easy to get
+wrong. Web search results and old blog posts often show a version that is stale,
+removed, or even known to be unsafe. This project's build is picky about
+versions, so a wrong one can quietly break it.
+- When choosing or updating a dependency version, take it from the official
+  registry or the project's own release page, not from a search-result snippet.
+- Show the user where the version came from, so it can be double-checked.
+
 ## Review Rules Before Commits
 
 Before suggesting a commit or calling work "done":
@@ -187,6 +196,23 @@ Testing translation rule:
 - Explain in plain English what a pass looks like and what a fail looks like.
 - If a test fails, treat it like an error: translate it, show where it points, explain why, fix it, re-explain what to check next.
 - For path resolution and session handling specifically (see Risk-First Rule #1 and #3), always confirm there is a simple before/after check the user can personally verify, not just "the test suite passed."
+
+Self-review before opening a pull request:
+Plain-English meaning: before asking the user to look at a change, read the whole
+change yourself first, as if you were a stranger seeing it for the first time.
+- Re-read the full set of changes end to end and look for anything surprising,
+  half-finished, or accidentally included.
+- Only then summarize it for the user. Catching a mistake here is cheaper than
+  catching it after review starts.
+
+Record mistakes as forward-looking rules:
+Plain-English meaning: when something goes wrong and gets fixed — a broken build,
+a wrong version, a bug in generated code — write down what went wrong and what to
+do instead, in the same session the fix happens. This is how the same mistake is
+prevented next time instead of quietly repeating.
+- State the mistake, the root cause, and the rule to follow going forward.
+- Keep each note short and specific. Save it where it will be seen again before
+  similar work (memory and/or the relevant project notes), not "later."
 
 If a deterministic scanner like vibecop is available, use it as an extra check.
 Do not treat the scanner as a substitute for human review.
@@ -205,6 +231,54 @@ Focus:
 - Do all planning, coding, explaining, and reviewing in this same conversation.
 - Do not hand work off to separate agents or hidden processes.
 - Everything should happen where the user can see it, ask about it, and follow along in plain English.
+
+Stopping cleanly:
+Plain-English meaning: when work has to pause partway — because it is a good
+stopping point, or the next step needs a decision — leave a short, predictable
+summary so it is easy to pick back up.
+- When pausing mid-task, say plainly: what got done, the current state, and the
+  single next step.
+- Keep it short. The point is that the user (and a future session) can resume
+  without re-reading everything.
+
+## Kotlin Style Rules
+
+Plain-English meaning: Kotlin can be written in a clean, modern way, or in an
+awkward "Java habits in a Kotlin file" way. Both run, but the clean way has fewer
+hidden bugs and is easier to read. These are habits to follow when writing or
+changing Kotlin in this project. They are adapted from the ideas in
+jbaruch/kotlin-tutor, but only the ones that fit an Android app — its
+server/machine-learning library picks and its test-framework switch were left
+out on purpose.
+
+Apply these when writing Kotlin:
+- **Default to values that do not change (`val`).** Only use a changeable
+  variable (`var`) when something genuinely needs to change, and say why. This
+  prevents a whole class of "something changed when I did not expect it" bugs.
+- **Use Kotlin's built-in "might be empty" mark (`String?`), not Java's
+  `Optional`.** Then lean on the safe operators (`?.`, `?:`) instead of manual
+  null checks. (No caution needed here — this project has no published library
+  interface that a change like this could break.)
+- **For plain data-holding types, use a `data class`.** It lets Kotlin write the
+  repetitive comparison/printing code automatically, so it cannot silently fall
+  out of date when a field is added later. Do not hand-write that boilerplate.
+- **Use Kotlin's small scope helpers (`let` / `apply` / `also`) to replace
+  clunky Java patterns — but only when they make the code clearer.** If a block
+  gets long or nested, write it out the plain way instead. Readability wins over
+  cleverness.
+- **Add a helper onto the type it belongs to (an extension function) instead of
+  a separate `SomethingUtils` class.** `text.normalize()` reads better than
+  `StringUtils.normalize(text)`, and it costs nothing at runtime.
+
+On the shelf, adopt later (not yet):
+- **Reactive state (`StateFlow`) instead of a check-over-and-over loop.** This is
+  a good Android pattern, but it only matters once the live terminal screen is
+  being built. Revisit it during the app-shell phase.
+
+Deliberately not adopted:
+- **Switching the test tool from JUnit to Kotest.** This project already uses
+  JUnit and its checks pass on it. Switching would risk breaking those checks
+  for no real gain on a personal, solo project.
 
 ## Maintenance Rules
 
