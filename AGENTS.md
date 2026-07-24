@@ -86,11 +86,21 @@ Plain-English meaning:
 This is the starter kit the app installs for itself on first launch.
 If this is wrong, the app may fail on first run or install the wrong tools.
 
+The bootstrap payload lives at
+`app/src/main/assets/itermux/bootstrap/arm64-v8a/bootstrap.tar.xz`. It is a
+binary artifact and is **not committed** (git-ignored). Stage it for a local
+build with `scripts/fetch-bootstrap.sh`; the directory README documents the
+acquisition contract. The runtime auto-installs it on first launch when present
+(`iTermux.initialize` -> `iTermuxBootstrapInstaller`), and launches safely
+without it. The Alpine default is a musl smoke-test payload; a glibc arm64
+rootfs is needed for real proot sessions.
+
 Before approving a change here:
 - Explain what packages are being included.
 - Explain what happens on a fresh install.
 - Prefer offline-first behavior when possible.
 - Require a cold-start test plan.
+- Never commit the `bootstrap.tar.xz` payload; it is fetch-staged, not vendored.
 
 ### 3. Shell execution and session handling
 

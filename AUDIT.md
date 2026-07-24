@@ -37,13 +37,25 @@ ABI can host a session.
 
 | ABI | Asset path | Support status | Notes |
 | --- | --- | --- | --- |
-| `arm64-v8a` | `core/src/main/assets/itermux/bootstrap/arm64-v8a/bootstrap.tar.xz` | Required | The only supported device path (Snapdragon / arm64). |
+| `arm64-v8a` | `app/src/main/assets/itermux/bootstrap/arm64-v8a/bootstrap.tar.xz` | Required | The only supported device path (Snapdragon / arm64). Loaded via `context.assets.open(...)` from the app module. |
 | `armeabi-v7a` | none | Dropped | Removed with the arm64-only trim; proroot has no 32-bit ARM build. |
 | `x86_64` | none | Dropped | Removed with the arm64-only trim; drops emulator/Chromebook support. |
 | Any other ABI list | none | Unsupported | Runtime must fail early with `UNSUPPORTED_ABI` before extraction. |
 
 The app packages only `arm64-v8a` via `abiFilters` in `app/build.gradle.kts`,
 and `minSdk` is raised to 26 (Android 8.0) to match proroot's minimum.
+
+The `bootstrap.tar.xz` payload is a binary runtime artifact and is **not
+committed** (`.gitignore` excludes `**/assets/itermux/bootstrap/**/*.tar.xz`),
+consistent with the proroot `.so` policy. Stage it for a local build with
+`scripts/fetch-bootstrap.sh`; see
+`app/src/main/assets/itermux/bootstrap/arm64-v8a/README.md` for the acquisition
+contract and archive requirements. The full install path (resolve -> detect via
+`hasAsset` -> auto-install -> extract -> `READY`) is already wired end to end in
+`iTermux.initialize` / `iTermuxBootstrapInstaller`; the missing piece for a
+working cold start is the payload itself (and, for glibc proot sessions, a
+glibc arm64 rootfs rather than the Alpine smoke-test default). The app still
+launches safely with no payload present (`bootstrapPayloadPackaged = false`).
 
 ## Rootless-Linux launcher: proroot
 
