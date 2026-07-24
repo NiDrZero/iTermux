@@ -25,7 +25,7 @@ class iTermuxBootstrapAssetsTest {
         val runtime = iTermuxRuntimeInitializer.initialize(
             filesDir = Files.createTempDirectory("itermux-bootstrap-assets-refresh").toFile().absolutePath,
             hostPackageName = "com.darkian.host",
-            supportedAbis = listOf("x86_64"),
+            supportedAbis = listOf("arm64-v8a"),
             isBootstrapPayloadPackaged = false,
         )
 
@@ -39,8 +39,22 @@ class iTermuxBootstrapAssetsTest {
             isBootstrapPayloadPackaged = runtime.isBootstrapPayloadPackaged,
         )
 
-        assertEquals("x86_64", refreshed.bootstrapVariantAbi)
-        assertEquals("itermux/bootstrap/x86_64/bootstrap.tar.xz", refreshed.bootstrapAssetPath)
+        assertEquals("arm64-v8a", refreshed.bootstrapVariantAbi)
+        assertEquals("itermux/bootstrap/arm64-v8a/bootstrap.tar.xz", refreshed.bootstrapAssetPath)
         assertFalse(refreshed.isBootstrapPayloadPackaged)
+    }
+
+    @Test
+    fun droppedAbiResolvesToUnsupportedAbiFailure() {
+        // A device that reports only a dropped ABI (e.g. x86_64) must fail early
+        // with UNSUPPORTED_ABI rather than silently selecting a variant.
+        val runtime = iTermuxRuntimeInitializer.initialize(
+            filesDir = Files.createTempDirectory("itermux-bootstrap-assets-unsupported").toFile().absolutePath,
+            hostPackageName = "com.darkian.host",
+            supportedAbis = listOf("x86_64"),
+            isBootstrapPayloadPackaged = false,
+        )
+
+        assertEquals(iTermuxRuntimeFailureCause.UNSUPPORTED_ABI, runtime.failureCause)
     }
 }

@@ -29,7 +29,10 @@ class iTermuxProotPluginTest {
         assertEquals("debian-main", session.id)
         assertEquals(iTermuxProotPlugin.BACKEND, session.backend)
         assertEquals(iTermuxSessionMode.LOGIN_SHELL, session.mode)
-        assertEquals("${runtime.paths.binDir}/proot", session.shellSpec.executable)
+        assertEquals(
+            "${runtime.paths.binDir}/${iTermuxProotPlugin.PROROOT_LAUNCHER}",
+            session.shellSpec.executable,
+        )
         assertEquals(
             listOf(
                 "--link2symlink",
@@ -48,8 +51,9 @@ class iTermuxProotPluginTest {
             ),
             session.shellSpec.arguments,
         )
-        assertEquals("proot", session.shellSpec.environment["ITERMUX_SESSION_BACKEND"])
+        assertEquals("proroot", session.shellSpec.environment["ITERMUX_SESSION_BACKEND"])
         assertEquals("debian", session.shellSpec.environment["PROOT_DISTRO_NAME"])
+        assertEquals(runtime.paths.filesDir, session.shellSpec.environment["PROROOT_TMP_DIR"])
         assertFalse(session.shellSpec.environment.containsKey("HOST_ONLY"))
     }
 

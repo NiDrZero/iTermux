@@ -20,6 +20,17 @@ Atomux has two distinct upstreams, and they must never be collapsed into one
   each hop; Atomux does not merge Termux directly without going through the
   fork lineage's framing.
 
+## Rootless-Linux launcher upstream: proroot
+
+The optional proot backend uses
+[`coderredlab/proroot`](https://github.com/coderredlab/proroot), a drop-in,
+proot-compatible launcher with zero ptrace overhead. It is a **binary
+dependency**, not a source lineage: the arm64-v8a `.so` files are fetched from
+proroot Releases and dropped into `app/src/main/jniLibs/arm64-v8a/` (they are
+not committed to this repo). This supersedes the legacy `proot-distro` scripts
+as the launcher; `proot-distro` stays a reference only for distro rootfs layout.
+Track proroot releases explicitly and re-vendor the `.so` set when upgrading.
+
 Mirror each lineage under its own path (for example `upstream/itermux` for the
 fork parent and `upstream/termux-app` for Termux) and compare against the
 lineage that actually owns the file you are reviewing. Do not diff a

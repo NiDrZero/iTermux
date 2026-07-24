@@ -11,10 +11,18 @@ android {
 
     defaultConfig {
         applicationId = "com.nidrzero.atomux"
-        minSdk = 21
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
+
+        // Atomux targets 64-bit ARM (Snapdragon and other arm64 SoCs) only.
+        // proroot ships arm64-v8a native launchers exclusively, and the
+        // bootstrap payload is a single arm64-v8a variant, so no other ABI is
+        // packaged. This deliberately drops armeabi-v7a and x86_64.
+        ndk {
+            abiFilters += "arm64-v8a"
+        }
     }
 
     buildTypes {

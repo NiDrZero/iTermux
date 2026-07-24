@@ -5,3 +5,10 @@
 /build/
 **/build/
 /local.properties
+
+# proroot native libraries are vendored from proroot Releases, not committed.
+# Keep the README that documents how to fetch them.
+app/src/main/jniLibs/**/*.so
+
+# Bootstrap payloads are never committed (see AUDIT.md).
+**/assets/itermux/bootstrap/**/*.tar.xz
