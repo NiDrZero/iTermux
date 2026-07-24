@@ -21,19 +21,18 @@ object iTermuxBootstrapResolver {
         }
     }
 
+    /**
+     * Atomux targets 64-bit ARM only (Snapdragon and other arm64 SoCs).
+     * armeabi-v7a and x86_64 were intentionally dropped: proroot ships an
+     * arm64-v8a launcher exclusively, so no other ABI can host a session.
+     * Callers that need a different ABI (e.g. tests) can still supply their
+     * own variants via [iTermuxConfig.bootstrapVariants].
+     */
     fun defaultVariants(): List<iTermuxBootstrapVariant> {
         return listOf(
             iTermuxBootstrapVariant(
                 abi = "arm64-v8a",
                 assetPath = "itermux/bootstrap/arm64-v8a/bootstrap.tar.xz",
-            ),
-            iTermuxBootstrapVariant(
-                abi = "armeabi-v7a",
-                assetPath = "itermux/bootstrap/armeabi-v7a/bootstrap.tar.xz",
-            ),
-            iTermuxBootstrapVariant(
-                abi = "x86_64",
-                assetPath = "itermux/bootstrap/x86_64/bootstrap.tar.xz",
             ),
         )
     }

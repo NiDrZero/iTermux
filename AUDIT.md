@@ -29,15 +29,40 @@ there during this audit.
 
 ## Current embedded bootstrap matrix
 
-Phase 7 ABI packaging now treats the bootstrap payload as variant-specific
-instead of assuming one universal tarball path:
+Atomux targets **64-bit ARM only** (Snapdragon and other arm64 SoCs). The
+bootstrap payload stays variant-specific, but only the arm64-v8a variant is
+packaged. `armeabi-v7a` and `x86_64` were intentionally dropped: the proroot
+launcher (see below) ships an arm64-v8a native library exclusively, so no other
+ABI can host a session.
 
 | ABI | Asset path | Support status | Notes |
 | --- | --- | --- | --- |
-| `arm64-v8a` | `core/src/main/assets/itermux/bootstrap/arm64-v8a/bootstrap.tar.xz` | Required | Primary Android device path. |
-| `armeabi-v7a` | `core/src/main/assets/itermux/bootstrap/armeabi-v7a/bootstrap.tar.xz` | Supported | Fallback for older 32-bit ARM devices. |
-| `x86_64` | `core/src/main/assets/itermux/bootstrap/x86_64/bootstrap.tar.xz` | Supported | Emulator and Chromebook path. |
+| `arm64-v8a` | `core/src/main/assets/itermux/bootstrap/arm64-v8a/bootstrap.tar.xz` | Required | The only supported device path (Snapdragon / arm64). |
+| `armeabi-v7a` | none | Dropped | Removed with the arm64-only trim; proroot has no 32-bit ARM build. |
+| `x86_64` | none | Dropped | Removed with the arm64-only trim; drops emulator/Chromebook support. |
 | Any other ABI list | none | Unsupported | Runtime must fail early with `UNSUPPORTED_ABI` before extraction. |
+
+The app packages only `arm64-v8a` via `abiFilters` in `app/build.gradle.kts`,
+and `minSdk` is raised to 26 (Android 8.0) to match proroot's minimum.
+
+## Rootless-Linux launcher: proroot
+
+The optional proot backend is now
+[`coderredlab/proroot`](https://github.com/coderredlab/proroot) — a drop-in,
+proot-compatible launcher with zero ptrace overhead, distributed as arm64-v8a
+native libraries.
+
+| Item | Value |
+| --- | --- |
+| Launcher | `libproroot.so` (plus 4 companion `.so` files, auto-discovered from its own dir) |
+| Packaging | `app/src/main/jniLibs/arm64-v8a/` (binaries fetched from proroot Releases, not committed) |
+| CLI | proot-compatible: `-r <rootfs>`, `-b <host>[:guest]`, `-w <dir>`, `-0`, `--link2symlink` |
+| Required env | `PROROOT_TMP_DIR` = app files dir (writable runtime config location) |
+| Minimum | Android 8.0+ (API 26), arm64-v8a, glibc arm64 rootfs |
+
+proroot supersedes the legacy `upstream/proot-distro` reference as the launcher
+implementation. `proot-distro` remains a reference only for distro rootfs
+layout, not for the launcher binary.
 
 ## Category A: Package identity and Android app ownership
 

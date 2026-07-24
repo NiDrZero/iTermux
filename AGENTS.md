@@ -104,17 +104,24 @@ Before approving a change here:
 - Explain what input reaches the shell.
 - Flag any unsafe or indirect command building.
 
-### 4. proot support
+### 4. proot support (now backed by proroot)
 
 Plain-English meaning:
 This is an optional fake-Linux layer used when the normal Android-based environment is not enough.
 It adds power, but also extra complexity and more ways for things to break.
 
+The backend is now [proroot](https://github.com/coderredlab/proroot) — a drop-in,
+proot-compatible launcher with zero ptrace overhead, shipped as arm64-v8a native
+libraries (not committed; fetched into `app/src/main/jniLibs/arm64-v8a/`). It is
+arm64-only, which is consistent with Atomux's arm64-only ABI target.
+
 Before approving a change here:
-- Treat proot as optional, not core.
-- Explain why proot is needed at all.
+- Treat proot/proroot as optional, not core.
+- Explain why the rootless layer is needed at all.
 - Confirm it stays separate from the main runtime.
 - Flag any hidden mixing of environments.
+- Confirm the launcher path and `PROROOT_TMP_DIR` point at app-owned locations.
+- Do not commit proroot `.so` binaries; they are release-vendored.
 
 ### 5. Keys, credentials, networking, and permissions
 

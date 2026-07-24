@@ -12,13 +12,23 @@ import com.darkian.itermux.core.iTermuxShellSpec
 import com.darkian.itermux.core.sessionStartFailureCause
 
 /**
- * Optional proot launcher that stays outside the core runtime module while
- * returning the same host-facing session contract as native sessions.
+ * Optional rootless-Linux launcher that stays outside the core runtime module
+ * while returning the same host-facing session contract as native sessions.
+ *
+ * The backend is proroot (https://github.com/coderredlab/proroot): a drop-in,
+ * proot-compatible launcher with zero ptrace overhead. It is distributed as
+ * arm64-v8a native libraries (`libproroot.so` and four companion `.so` files)
+ * that the host packages under `jniLibs/arm64-v8a/`. The launcher auto-discovers
+ * its companion libraries from its own directory, so only its path and a
+ * writable `PROROOT_TMP_DIR` need to be supplied.
  */
 object iTermuxProotPlugin {
-    const val MODULE_ID: String = "internal-termux-proot"
+    const val MODULE_ID: String = "internal-termux-proroot"
 
-    val BACKEND: iTermuxSessionBackend = iTermuxSessionBackend(id = "proot")
+    /** Native launcher file name shipped in `jniLibs/arm64-v8a/`. */
+    const val PROROOT_LAUNCHER: String = "libproroot.so"
+
+    val BACKEND: iTermuxSessionBackend = iTermuxSessionBackend(id = "proroot")
 
     fun launch(
         runtime: iTermuxRuntime,
@@ -29,7 +39,7 @@ object iTermuxProotPlugin {
         baseEnv: Map<String, String> = emptyMap(),
         extraEnv: Map<String, String> = emptyMap(),
         config: iTermuxProotConfig = iTermuxProotConfig(
-            executable = "${runtime.paths.binDir}/proot",
+            executable = "${runtime.paths.binDir}/$PROROOT_LAUNCHER",
         ),
     ): iTermuxSession {
         val startFailureCause = when {
@@ -53,6 +63,9 @@ object iTermuxProotPlugin {
                     "ITERMUX_SESSION_BACKEND" to BACKEND.id,
                     "PROOT_DISTRO_NAME" to distribution.name,
                     "PROOT_DISTRO_ROOTFS" to distribution.rootfsPath,
+                    // proroot writes runtime config files here; must be a
+                    // writable app-owned directory (the runtime files dir).
+                    "PROROOT_TMP_DIR" to runtime.paths.filesDir,
                 )
                 mergedExtraEnv.putAll(extraEnv)
 
@@ -122,6 +135,14 @@ data class iTermuxProotDistribution(
     val workingDirectory: String = "/root",
 )
 
+/**
+ * Launcher configuration for a proroot session.
+ *
+ * Defaults use proroot's proot-compatible flags: `--link2symlink` for hardlink
+ * emulation and `-0` for the fakeroot uid/gid=0 mapping. proroot auto-discovers
+ * its companion `.so` files from the launcher's own directory, so only the
+ * launcher [executable] path needs to be supplied.
+ */
 data class iTermuxProotConfig(
     val executable: String,
     val bindPaths: List<String> = listOf("/dev", "/proc", "/sys"),
@@ -136,7 +157,7 @@ fun iTermuxRuntime.createProotSession(
     baseEnv: Map<String, String> = emptyMap(),
     extraEnv: Map<String, String> = emptyMap(),
     config: iTermuxProotConfig = iTermuxProotConfig(
-        executable = "${paths.binDir}/proot",
+        executable = "${paths.binDir}/${iTermuxProotPlugin.PROROOT_LAUNCHER}",
     ),
 ): iTermuxSession {
     return iTermuxProotPlugin.launch(
