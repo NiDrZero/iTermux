@@ -2,7 +2,7 @@
 
 Phase 9 keeps DS logic on four states instead of mirroring every raw iTermux
 state. The normalization layer lives in
-`sample-app/src/main/java/com/darkian/itermux/sample/iTermuxDsStateMapper.kt`
+`app/src/main/java/com/darkian/itermux/sample/iTermuxDsStateMapper.kt`
 and `iTermuxDsLifecycleRecorder.kt`.
 
 | Raw iTermux signal | DS runtime state | Notes |

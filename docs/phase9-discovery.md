@@ -18,7 +18,7 @@ device passes land against an explicit target list instead of ad-hoc testing.
 Captured on 2026-04-16 with:
 
 ```powershell
-./gradlew.bat :sample-app:testDebugUnitTest `
+./gradlew.bat :app:testDebugUnitTest `
   --tests "com.darkian.itermux.sample.iTermuxPerformanceBaselineProbeTest" `
   --rerun-tasks `
   --console=plain `

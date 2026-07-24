@@ -7,7 +7,7 @@ into:
 
 - `upstream/` for clean reference clones only
 - the repo root for the actual forked project modules (`core/`, `proot-plugin/`,
-  `sample-app/`, `tools/`, Gradle files)
+  `app/`, `tools/`, Gradle files)
 
 Do not edit files under `upstream/`. Pull and diff there, but keep it as the
 reference point.
